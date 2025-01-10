@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Navbar with Google Sign-In</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .g_id_signin {
+            margin-top: 5px;
+        }
+
+        .navbar-nav {
+            flex-direction: row;
+        }
+
+        .navbar-nav .nav-item {
+            margin-left: 15px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/playlist/playlist_add">Home</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/playlist/playlist_status">Playlists</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/playlist/all_playlists">All Playlists</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                {% if request.session.user_data %}
+                <div>
+                    <p class="text-white mb-0">Hi {{ request.session.user_data.given_name }} 🙂 <a class="btn btn-outline-light" href="/sign-out">Sign out</a></p>                    
+                </div>
+                {% else %}
+                <div id="g_id_signin"
+                    class="g_id_signin"
+                    data-type="standard"
+                    data-shape="pill"
+                    data-theme="outline"
+                    data-text="signin_with"
+                    data-size="large"
+                    data-logo_alignment="left">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    window.onload = function() {
+        if (!document.getElementById('g_id_signin')) return;
+        
+        google.accounts.id.initialize({
+            client_id: '50693879569-05fd5b62rcljnjji65pv6p5i8hcauc41.apps.googleusercontent.com',
+            callback: function(response) {
+                console.log('Google Sign-In response:', response);
+                // Handle the response here
+            }
+        });
+        google.accounts.id.renderButton(
+            document.getElementById('g_id_signin'),
+            { theme: 'outline', size: 'large' }  // Customize button style
+        );
+        google.accounts.id.prompt(); // Prompt the user to sign in
+    };
+</script>
+
+</body>
+</html>

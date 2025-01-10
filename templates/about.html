@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Playlist Downloader</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: justify;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .fa-play-circle {
+            color: #007bff;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="container">
+        <h1>About Playlist Downloader</h1>
+        <p>
+            Welcome to Playlist Downloader, a Django-based web application that simplifies the process of downloading YouTube videos and integrating them into your music collection in Navidrome.
+        </p>
+        <p>
+            Whether you're a music enthusiast or a casual listener, Playlist Downloader provides you with a convenient way to create playlists, download YouTube videos, and seamlessly add them to your Navidrome library.
+        </p>
+        <p>
+            With Playlist Downloader, you can easily discover new music on YouTube and enjoy it in your preferred music player without any hassle.
+        </p>
+        <p>
+            Ready to get started? Click the button below to visit the homepage and begin exploring the features of Playlist Downloader.
+        </p>
+        <a href="/" class="btn"><i class="fas fa-play-circle"></i> Get Started</a>
+    </div>
+
+</body>
+</html>

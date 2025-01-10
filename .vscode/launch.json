@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Django: Runserver",
+            "python": "C:/Projects/perso/oprogreso/venv/Scripts/python.exe",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "C:/Projects/perso/oprogreso/manage.py",
+            "console": "internalConsole",
+            "args": [
+                "runserver"
+            ],
+            "django": true
+        }
+    ]
+}
