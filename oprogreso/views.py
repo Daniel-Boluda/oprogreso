@@ -19,3 +19,7 @@ def marcar_actividad(request, actividad_id):
         actividad.save()
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
+
+def bloques_list(request):
+    bloques = Bloque.objects.all().order_by('orden')
+    return render(request, 'bloques_list.html', {'bloques': bloques})

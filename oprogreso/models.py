@@ -9,8 +9,10 @@ class Bloque(models.Model):
 
 class Tema(models.Model):
     titulo = models.CharField(max_length=200)
+    contenido = models.TextField(null=True, blank=True)
     bloque = models.ForeignKey(Bloque, on_delete=models.CASCADE)  # Linking Tema to Bloque
     notas = models.TextField(blank=True)
+    orden = models.IntegerField(default=0)  # Field for ordering
 
     def __str__(self):
         return self.titulo
