@@ -6,15 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <style>
-        
+        .bloque { margin-bottom: 20px; }
+        .tema { margin-left: 20px; }
+        .actividad { display: inline-block; margin-right: 10px; cursor: pointer; }
+        .realizada { color: green; }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     {% include 'navbar.html' %}
     
-    <div class="container">
-        <h1>Home</h1>
+    <div class="container mt-4">
+        <h1>Lista de Bloques</h1>
+        {% for bloque in bloques %}
+            <div class="bloque">
+                <h2>{{ bloque.titulo }}</h2>
+                {% for tema in bloque.tema_set.all %}
+                    <div class="tema">
+                        <h3>{{ tema.titulo }}</h3>
+                        {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
+                            <div class="actividad {% if actividad.realizada %}realizada{% endif %}" data-id="{{ actividad.id }}">
+                                {{ actividad.titulo }}
+                                {% if actividad.realizada %}✓{% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
     </div>
+
+    <script>
+    $(document).ready(function() {
+        $('.actividad').click(function() {
+            var actividadId = $(this).data('id');
+            var $this = $(this);
+            
+            $.ajax({
+                url: '/marcar-actividad/' + actividadId + '/',
+                method: 'POST',
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $this.addClass('realizada');
+                        $this.append(' ✓');
+                    }
+                }
+            });
+        });
+    });
+    </script>
 
 </body>
 </html>

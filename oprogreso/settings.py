@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "oprogreso",
     "accounts"
 ]
 
@@ -76,14 +77,24 @@ TEMPLATES = [
 WSGI_APPLICATION = "oprogreso.wsgi.application"
 
 # Database configuration
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.getenv('POSTGRES_DB', 'oprogreso'),
+#        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+#        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
+#        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+#        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+#    }
+#}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'oprogreso'),
-        'USER': os.getenv('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'NAME': 'oprogreso',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
