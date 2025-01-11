@@ -1,23 +1,22 @@
-from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Sum
 from .models import Logro, Bloque, Tema, Actividad
 
 def homepage(request):
-    bloques = Bloque.objects.all()
+    bloques = Bloque.objects.all().order_by('orden')
     actividades = Actividad.objects.filter(realizada=True)
-    puntos_totales = sum(a.puntos for a in actividades)
+    puntos_totales = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
     
     logros = Logro.objects.order_by('puntos_necesarios')
     alcanzados = logros.filter(puntos_necesarios__lte=puntos_totales)
     siguientes = logros.filter(puntos_necesarios__gt=puntos_totales)
     
     if alcanzados.count() >= 3:
-        logros_a_mostrar = list(alcanzados[-3:]) + list(siguientes[:3])
+        logros_a_mostrar = list(alcanzados.order_by('-puntos_necesarios')[:3]) + list(siguientes[:3])
     else:
-        logros_a_mostrar = list(siguientes[:6])
+        logros_a_mostrar = list(alcanzados) + list(siguientes[:6-alcanzados.count()])
     
     puntos_totales_requeridos = logros.last().puntos_necesarios if logros.exists() else 0
     porcentaje = (puntos_totales / puntos_totales_requeridos) * 100 if puntos_totales_requeridos > 0 else 0
@@ -49,15 +48,39 @@ def bloques_list(request):
     bloques = Bloque.objects.all().order_by('orden')
     return render(request, 'bloques_list.html', {'bloques': bloques})
 
-# Vista para obtener datos de los logros dinámicamente
 def obtener_logros(request):
-    # Supongamos que estos datos vienen de la base de datos
-    logros = [
-        {"puntos": 100, "estado": "reached", "recompensa": None},
-        {"puntos": 250, "estado": "reached", "recompensa": None},
-        {"puntos": 500, "estado": "next", "recompensa": 100},
-        {"puntos": 750, "estado": "locked", "recompensa": None},
-        {"puntos": 1000, "estado": "locked", "recompensa": None},
-    ]
-    total_puntos = 500  # Puntos del usuario, ajusta según lógica
-    return JsonResponse({"logros": logros, "total_puntos": total_puntos})
+    actividades = Actividad.objects.filter(realizada=True)
+    total_puntos = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
+    
+    logros = Logro.objects.order_by('puntos_necesarios')
+    logros_data = []
+    
+    for logro in logros:
+        if logro.puntos_necesarios <= total_puntos:
+            estado = 'reached'
+        elif logro == logros.filter(puntos_necesarios__gt=total_puntos).first():
+            estado = 'next'
+        else:
+            estado = 'locked'
+        
+        logros_data.append({
+            'nombre': logro.nombre,
+            'puntos': logro.puntos_necesarios,
+            'estado': estado,
+            'descripcion': logro.descripcion,
+        })
+    
+    return JsonResponse({
+        'logros': logros_data,
+        'total_puntos': total_puntos
+    })
+
+def detalle_tema(request, tema_id):
+    tema = get_object_or_404(Tema, id=tema_id)
+    actividades = tema.actividad_set.all().order_by('orden')
+    return render(request, 'detalle_tema.html', {'tema': tema, 'actividades': actividades})
+
+def detalle_bloque(request, bloque_id):
+    bloque = get_object_or_404(Bloque, id=bloque_id)
+    temas = bloque.tema_set.all().order_by('orden')
+    return render(request, 'detalle_bloque.html', {'bloque': bloque, 'temas': temas})

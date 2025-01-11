@@ -5,140 +5,166 @@
     <title>Lista de Bloques</title>
     <style>
         body {
-            background-color: #f4f4f4;
+            background-color: #f8f1f4; /* Fondo en tono pastel */
             font-family: Arial, sans-serif;
         }
+        
         .navbar-brand {
             font-weight: bold;
         }
+        
         .card {
             margin-bottom: 20px;
-            border: 1px solid #ccc;
+            border: 1px solid #e6ccd5; /* Tono pastel suave */
             border-radius: 8px;
         }
+        
+        .card-header {
+            background-color: #d6a4e0 !important; /* Lila claro */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            font-size: 18px;
+        }
+        
         .card-header {
             padding: 10px;
             font-size: 18px;
             font-weight: bold;
             color: white;
+            background-color: #d6a4e0; /* Lila claro */
+            text-align: center;
         }
+        
         .card-body {
             padding: 15px;
             background-color: white;
         }
+        
         .actividad-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
+        
         .actividad-button {
             padding: 5px 10px;
-            border: 1px solid #007bff;
+            border: 1px solid #f78fb3;
             background-color: white;
-            color: #007bff;
+            color: #f78fb3;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 120px; /* Ancho mínimo fijo */
+            text-align: center; /* Centrar el texto */
         }
+        
         .actividad-button:hover {
-            background-color: #007bff;
+            background-color: #f8a5c2;
             color: white;
         }
+        
         .actividad-button.realizada {
-            background-color: #28a745;
+            background-color: #d6a4e0;
             color: white;
-            border-color: #28a745;
+            border-color: #d6a4e0;
             cursor: default;
         }
+        
         table {
             width: 100%;
             border-spacing: 0;
         }
+        
         th, td {
             text-align: left;
-            padding: 8px;
+            padding: 10px;
         }
+        
         th {
-            background-color: #007bff;
+            background-color: #f78fb3; /* Rosa pastel */
             color: white;
+            font-size: 16px;
+            text-align: center;
         }
+        
         td {
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #f1d4dd; /* Línea suave */
         }
+        
         td.actividad-cell {
             text-align: right;
             white-space: nowrap;
         }
-    </style>
-    <style>
-        /* Estilos de la barra de logros */
+        
         .achievement-bar {
             position: relative;
-            background-color: #e0e0e0;
-            height: 20px;
-            border-radius: 10px;
+            background-color: #f1d4dd; /* Fondo barra pastel */
+            height: 20px; /* Incrementar altura */
+            border-radius: 20px; /* Ajustar para la nueva altura */
             margin: 20px auto;
             width: 80%;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
-            overflow: hidden; /* Asegura que nada salga fuera de la barra */
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            overflow: visible; /* Asegura que los marcadores sean visibles fuera de la barra */
         }
         
         .achievement-progress {
-            background-color: #f06292;
-            height: 100%;
-            border-radius: 10px 0 0 10px;
+            background-color: #d6a4e0; /* Lila claro */
+            height: 100%; /* Ocupa toda la altura de la barra */
+            border-radius: 20px 0 0 20px; /* Bordes redondeados */
             transition: width 0.3s ease-in-out;
         }
         
         .achievement-marker {
             position: absolute;
-            top: -10px; /* Ajusta la posición vertical */
-            height: 30px;
-            width: 30px;
-            margin-left: -15px; /* Ajusta para centrar el marcador */
-            border-radius: 50%;
+            top: -20px; /* Posiciona el marcador por encima de la barra */
+            height: 40px; /* Hacer los marcadores más grandes */
+            width: 40px; /* Hacer los marcadores más grandes */
+            margin-left: -20px; /* Centrar marcador en la barra */
+            border-radius: 50%; /* Forma circular */
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            font-size: 16px; /* Aumentar tamaño del texto */
             color: white;
+            z-index: 10; /* Asegura que los marcadores estén "por delante" */
         }
         
         .achievement-marker.reached {
-            background-color: #4caf50; /* Verde */
+            background-color: #a56fcb; /* Lila oscuro */
         }
         
         .achievement-marker.next {
-            background-color: #ffeb3b; /* Amarillo */
-            color: #333;
+            background-color: #f8a5c2; /* Rosa claro */
+            color: #574b60;
         }
         
         .achievement-marker.locked {
-            background-color: #bdbdbd; /* Gris */
+            background-color: #d1ccc0; /* Pastel neutro */
         }
+        
     </style>
 </head>
 <body>
 
 {% include 'navbar.html' %}
 
-<h1>Lista de Bloques</h1>
-
-<!-- Barra de Logros -->
-<div class="achievement-bar">
-    <div class="achievement-progress"></div>
-</div>
-<div class="achievement-label">Cargando puntos...</div>
-
-<!-- Marcadores de logros -->
-<div id="achievement-markers"></div>
-
 <div class="container mt-4">
+    <div class="achievement-bar">
+        <div class="achievement-progress"></div>
+        <div id="achievement-markers"></div>
+    </div>
+    <div class="achievement-label">Cargando puntos...</div>
+
+
     <h1 class="text-center mb-4">Lista de Bloques</h1>
 
     {% for bloque in bloques %}
         <div class="card">
-            <div class="card-header bg-primary">
+            <div class="card-header">
                 {{ bloque.titulo }}
             </div>
             <div class="card-body">
@@ -175,7 +201,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const buttons = document.querySelectorAll('.actividad-button');
-        
+
         buttons.forEach(button => {
             button.addEventListener('click', function() {
                 const actividadId = this.dataset.id;
@@ -191,8 +217,12 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
+                            // Marcar tarea como completada
                             this.classList.add('realizada');
                             this.textContent = `${this.textContent} ✓`;
+
+                            // Actualizar barra de logros y marcadores
+                            actualizarBarra(data.logros, data.total_puntos);
                         }
                     })
                     .catch(error => console.error('Error:', error));
@@ -200,61 +230,49 @@
             });
         });
     });
-</script>
 
-    <!-- Script para cargar logros dinámicamente -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // URL de la API de logros
-            const apiUrl = '/obtener_logros/';
+    function actualizarBarra(logros, totalPuntos) {
+        const progress = document.querySelector('.achievement-progress');
+        const label = document.querySelector('.achievement-label');
+        const markersContainer = document.querySelector('#achievement-markers');
 
-            // Función para actualizar la barra de logros
-            function actualizarBarra(logros, totalPuntos) {
-                const progress = document.querySelector('.achievement-progress');
-                const label = document.querySelector('.achievement-label');
-                const markersContainer = document.querySelector('#achievement-markers');
-            
-                const maxPuntos = logros[logros.length - 1].puntos;
-            
-                // Calcular el progreso en porcentaje
-                const porcentaje = (totalPuntos / maxPuntos) * 100;
-                progress.style.width = `${Math.min(porcentaje, 100)}%`;
-            
-                // Actualizar puntos totales
-                label.textContent = `Puntos: ${totalPuntos}`;
-            
-                // Limpiar marcadores anteriores
-                markersContainer.innerHTML = '';
-            
-                // Añadir marcadores
-                logros.forEach((logro) => {
-                    const marker = document.createElement('div');
-                    marker.className = `achievement-marker ${logro.estado}`;
-                    const left = (logro.puntos / maxPuntos) * 100;
-                    marker.style.left = `${Math.min(left, 100)}%`; // Asegurarse de que no pase del 100%
-            
-                    // Añadir texto o recompensa
-                    if (logro.recompensa) {
-                        marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
-                    } else if (logro.estado === 'reached') {
-                        marker.textContent = '✔';
-                    }
-            
-                    markersContainer.appendChild(marker);
-                });
+        const maxPuntos = logros[logros.length - 1].puntos;
+
+        const porcentaje = (totalPuntos / maxPuntos) * 100;
+        progress.style.width = `${Math.min(porcentaje, 100)}%`;
+
+        label.textContent = `Puntos: ${totalPuntos}`;
+
+        markersContainer.innerHTML = '';
+
+        logros.forEach((logro) => {
+            const marker = document.createElement('div');
+            marker.className = `achievement-marker ${logro.estado}`;
+            const left = (logro.puntos / maxPuntos) * 100;
+            marker.style.left = `${Math.min(left, 100)}%`;
+
+            if (logro.recompensa) {
+                marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
+            } else if (logro.estado === 'reached') {
+                marker.textContent = '✔';
             }
 
-            // Obtener datos de la API
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    actualizarBarra(data.logros, data.total_puntos);
-                })
-                .catch(error => {
-                    console.error('Error al cargar los logros:', error);
-                });
+            markersContainer.appendChild(marker);
         });
-    </script>
+    }
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const apiUrl = '/obtener_logros/';
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                actualizarBarra(data.logros, data.total_puntos);
+            })
+            .catch(error => {
+                console.error('Error al cargar los logros:', error);
+            });
+    });
+</script>
 </body>
 </html>
