@@ -99,6 +99,20 @@
             white-space: nowrap;
         }
         
+        .achievement-label {
+            text-align: center; /* Centra el texto */
+            font-size: 24px; /* Aumenta el tamaño de la fuente */
+            font-weight: bold; /* Hace el texto más destacado */
+            color: #ffffff; /* Texto blanco */
+            background-color: #a56fcb; /* Fondo rojo festivo */
+            padding: 10px 20px; /* Espaciado interno */
+            border-radius: 10px; /* Bordes redondeados */
+            box-shadow: 0 0 15px #a56fcb; /* Resplandor */
+            animation: celebration 1s infinite alternate; /* Animación */
+            margin: 20px auto; /* Espaciado y centrado automático */
+            width: fit-content; /* Ajusta el ancho al contenido */
+        }
+
         .achievement-bar {
             position: relative;
             background-color: #f1d4dd; /* Fondo barra pastel */
@@ -134,33 +148,61 @@
         }
         
         .achievement-marker.reached {
-            background-color: #a56fcb; /* Lila oscuro */
+            background-color: #a889c6; /* Lila pastel para logros alcanzados */
         }
         
         .achievement-marker.next {
-            background-color: #f8a5c2; /* Rosa claro */
-            color: #574b60;
+            background-color: #f8c5e3; /* Rosa pastel claro para el próximo logro */
+            color: #574b60; /* Texto en un tono neutral */
         }
         
         .achievement-marker.locked {
-            background-color: #d1ccc0; /* Pastel neutro */
+            background-color: #dbc3ce; /* Tono pastel suave para logros bloqueados */
         }
         
+        .achievement-label {
+            text-align: center; /* Centrar el texto */
+            font-size: 24px; /* Tamaño de fuente grande */
+            font-weight: bold; /* Texto destacado */
+            color: #ffffff; /* Texto blanco */
+            background-color: #a889c6; /* Fondo rojo vibrante */
+            padding: 10px 20px; /* Espaciado interno */
+            border-radius: 10px; /* Bordes redondeados */
+            margin: 20px auto; /* Centrar y espacio superior/inferior */
+            width: fit-content; /* Ajusta el ancho al contenido */
+            box-shadow: 0 0 10px #a889c6; /* Resplandor estático */
+        }
+
+        .achievement-marker .achievement-points {
+            position: absolute;
+            top: 50px; /* Posicionar debajo del marcador */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px; /* Ajustar tamaño de texto */
+            color: #c089b7; /* Lila-rosa pastel */
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap; /* Evitar que el texto se divida */
+        }
+
     </style>
 </head>
 <body>
 
 {% include 'navbar.html' %}
 
+<br>
+
 <div class="container mt-4">
+    <div class="achievement-label">Cargando puntos...</div>
+    <br>
     <div class="achievement-bar">
         <div class="achievement-progress"></div>
         <div id="achievement-markers"></div>
     </div>
-    <div class="achievement-label">Cargando puntos...</div>
 
-
-    <h1 class="text-center mb-4">Lista de Bloques</h1>
+    <br>
+    <br>
 
     {% for bloque in bloques %}
         <div class="card">
@@ -178,7 +220,11 @@
                     <tbody>
                         {% for tema in bloque.tema_set.all %}
                             <tr>
-                                <td>{{ tema.titulo }}</td>
+                                <td>    {{ tema.orden }} - {{ tema.titulo }}:
+                                    <ul>
+                                        <li>{{ tema.contenido }}</li>
+                                    </ul>
+                                </td>
                                 <td class="actividad-cell">
                                     {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
                                         <button 
@@ -235,28 +281,37 @@
         const progress = document.querySelector('.achievement-progress');
         const label = document.querySelector('.achievement-label');
         const markersContainer = document.querySelector('#achievement-markers');
-
+    
         const maxPuntos = logros[logros.length - 1].puntos;
-
+    
         const porcentaje = (totalPuntos / maxPuntos) * 100;
         progress.style.width = `${Math.min(porcentaje, 100)}%`;
-
-        label.textContent = `Puntos: ${totalPuntos}`;
-
-        markersContainer.innerHTML = '';
-
+    
+        label.textContent = `Puntos totales: ${totalPuntos}`;
+    
+        markersContainer.innerHTML = ''; // Limpia los marcadores existentes
+    
         logros.forEach((logro) => {
+            // Crear el marcador principal
             const marker = document.createElement('div');
             marker.className = `achievement-marker ${logro.estado}`;
             const left = (logro.puntos / maxPuntos) * 100;
             marker.style.left = `${Math.min(left, 100)}%`;
-
+    
+            // Crear el contenedor para puntos del logro
+            const puntosLogro = document.createElement('div');
+            puntosLogro.className = 'achievement-points';
+            puntosLogro.textContent = `${logro.puntos}`;
+    
+            // Agregar el contenido al marcador
             if (logro.recompensa) {
                 marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
             } else if (logro.estado === 'reached') {
                 marker.textContent = '✔';
             }
-
+    
+            // Añadir marcador y puntos al contenedor
+            marker.appendChild(puntosLogro);
             markersContainer.appendChild(marker);
         });
     }

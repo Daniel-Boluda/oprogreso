@@ -33,6 +33,8 @@ class Logro(models.Model):
     puntos_necesarios = models.IntegerField(default=0)  # Puntos necesarios para alcanzar el logro
     descripcion = models.TextField()
     completado = models.BooleanField(default=False)  # Field to indicate completion
+    imagen = models.ImageField(upload_to='logros/', blank=True, null=True)  # Imagen asociada al logro
+
 
     def __str__(self):
         return self.nombre

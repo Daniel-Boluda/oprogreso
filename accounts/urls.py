@@ -8,10 +8,10 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    re_path(r'^$', RedirectView.as_view(url='/playlist/playlist_add', permanent=False), name='root_redirect'),
     path('login/', views.sign_in, name='sign_in'),
     path('sign-out', views.sign_out, name='sign_out'),
     path('auth-receiver', views.auth_receiver, name='auth_receiver'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
