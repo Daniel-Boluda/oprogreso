@@ -29,7 +29,8 @@ class Actividad(models.Model):
         return f"Actividad for {self.tema.titulo} - Puntos: {self.puntos}"
 
 class Logro(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=255)
+    puntos_necesarios = models.IntegerField(default=0)  # Puntos necesarios para alcanzar el logro
     descripcion = models.TextField()
     completado = models.BooleanField(default=False)  # Field to indicate completion
 

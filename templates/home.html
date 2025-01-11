@@ -1,60 +1,259 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Lista de Bloques</title>
     <style>
-        .bloque { margin-bottom: 20px; }
-        .tema { margin-left: 20px; }
-        .actividad { display: inline-block; margin-right: 10px; cursor: pointer; }
-        .realizada { color: green; }
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .card-header {
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        .card-body {
+            padding: 15px;
+            background-color: white;
+        }
+        .actividad-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .actividad-button {
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            background-color: white;
+            color: #007bff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .actividad-button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .actividad-button.realizada {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+            cursor: default;
+        }
+        table {
+            width: 100%;
+            border-spacing: 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            border-bottom: 1px solid #ddd;
+        }
+        td.actividad-cell {
+            text-align: right;
+            white-space: nowrap;
+        }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Estilos de la barra de logros */
+        .achievement-bar {
+            position: relative;
+            background-color: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 80%;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+            overflow: hidden; /* Asegura que nada salga fuera de la barra */
+        }
+        
+        .achievement-progress {
+            background-color: #f06292;
+            height: 100%;
+            border-radius: 10px 0 0 10px;
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .achievement-marker {
+            position: absolute;
+            top: -10px; /* Ajusta la posición vertical */
+            height: 30px;
+            width: 30px;
+            margin-left: -15px; /* Ajusta para centrar el marcador */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .achievement-marker.reached {
+            background-color: #4caf50; /* Verde */
+        }
+        
+        .achievement-marker.next {
+            background-color: #ffeb3b; /* Amarillo */
+            color: #333;
+        }
+        
+        .achievement-marker.locked {
+            background-color: #bdbdbd; /* Gris */
+        }
+    </style>
 </head>
 <body>
-    {% include 'navbar.html' %}
-    
-    <div class="container mt-4">
-        <h1>Lista de Bloques</h1>
-        {% for bloque in bloques %}
-            <div class="bloque">
-                <h2>{{ bloque.titulo }}</h2>
-                {% for tema in bloque.tema_set.all %}
-                    <div class="tema">
-                        <h3>{{ tema.titulo }}</h3>
-                        {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
-                            <div class="actividad {% if actividad.realizada %}realizada{% endif %}" data-id="{{ actividad.id }}">
-                                {{ actividad.titulo }}
-                                {% if actividad.realizada %}✓{% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-    </div>
 
-    <script>
-    $(document).ready(function() {
-        $('.actividad').click(function() {
-            var actividadId = $(this).data('id');
-            var $this = $(this);
-            
-            $.ajax({
-                url: '/marcar-actividad/' + actividadId + '/',
-                method: 'POST',
-                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $this.addClass('realizada');
-                        $this.append(' ✓');
-                    }
+{% include 'navbar.html' %}
+
+<h1>Lista de Bloques</h1>
+
+<!-- Barra de Logros -->
+<div class="achievement-bar">
+    <div class="achievement-progress"></div>
+</div>
+<div class="achievement-label">Cargando puntos...</div>
+
+<!-- Marcadores de logros -->
+<div id="achievement-markers"></div>
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Lista de Bloques</h1>
+
+    {% for bloque in bloques %}
+        <div class="card">
+            <div class="card-header bg-primary">
+                {{ bloque.titulo }}
+            </div>
+            <div class="card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tema</th>
+                            <th>Actividades</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tema in bloque.tema_set.all %}
+                            <tr>
+                                <td>{{ tema.titulo }}</td>
+                                <td class="actividad-cell">
+                                    {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
+                                        <button 
+                                            class="actividad-button {% if actividad.realizada %}realizada{% endif %}" 
+                                            data-id="{{ actividad.id }}">
+                                            {{ actividad.titulo }}
+                                            {% if actividad.realizada %}<i class="fas fa-check"></i>{% endif %}
+                                        </button>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.actividad-button');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const actividadId = this.dataset.id;
+
+                if (!this.classList.contains('realizada')) {
+                    fetch(`/marcar-actividad/${actividadId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            this.classList.add('realizada');
+                            this.textContent = `${this.textContent} ✓`;
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
                 }
             });
         });
     });
+</script>
+
+    <!-- Script para cargar logros dinámicamente -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // URL de la API de logros
+            const apiUrl = '/obtener_logros/';
+
+            // Función para actualizar la barra de logros
+            function actualizarBarra(logros, totalPuntos) {
+                const progress = document.querySelector('.achievement-progress');
+                const label = document.querySelector('.achievement-label');
+                const markersContainer = document.querySelector('#achievement-markers');
+            
+                const maxPuntos = logros[logros.length - 1].puntos;
+            
+                // Calcular el progreso en porcentaje
+                const porcentaje = (totalPuntos / maxPuntos) * 100;
+                progress.style.width = `${Math.min(porcentaje, 100)}%`;
+            
+                // Actualizar puntos totales
+                label.textContent = `Puntos: ${totalPuntos}`;
+            
+                // Limpiar marcadores anteriores
+                markersContainer.innerHTML = '';
+            
+                // Añadir marcadores
+                logros.forEach((logro) => {
+                    const marker = document.createElement('div');
+                    marker.className = `achievement-marker ${logro.estado}`;
+                    const left = (logro.puntos / maxPuntos) * 100;
+                    marker.style.left = `${Math.min(left, 100)}%`; // Asegurarse de que no pase del 100%
+            
+                    // Añadir texto o recompensa
+                    if (logro.recompensa) {
+                        marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
+                    } else if (logro.estado === 'reached') {
+                        marker.textContent = '✔';
+                    }
+            
+                    markersContainer.appendChild(marker);
+                });
+            }
+
+            // Obtener datos de la API
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    actualizarBarra(data.logros, data.total_puntos);
+                })
+                .catch(error => {
+                    console.error('Error al cargar los logros:', error);
+                });
+        });
     </script>
 
 </body>

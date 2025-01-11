@@ -1,42 +1,61 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bloques list</title>
+    <title>Home</title>
     <style>
-        .bloque { margin-bottom: 20px; }
-        .tema { margin-left: 20px; }
-        .actividad { display: inline-block; margin-right: 10px; cursor: pointer; }
-        .realizada { color: green; }
+        body {
+            background-color: #f4f4f4;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .g_id_signin {
+            margin-top: 5px;
+        }
+        .actividad {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .actividad:hover {
+            background-color: #e9ecef; /* Light gray on hover */
+        }
+        .realizada {
+            background-color: #28a745; /* Success color */
+            color: white;
+        }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    {% include 'navbar.html' %}
-    
-    <div class="container mt-4">
-        <h1>Lista de Bloques</h1>
-        {% for bloque in bloques %}
-            <div class="bloque">
+
+{% include 'navbar.html' %}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Lista de Bloques</h1>
+
+    {% for bloque in bloques %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
                 <h2>{{ bloque.titulo }}</h2>
+            </div>
+            <div class="card-body">
                 {% for tema in bloque.tema_set.all %}
-                    <div class="tema">
-                        <h3>{{ tema.titulo }}</h3>
-                        {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
-                            <div class="actividad {% if actividad.realizada %}realizada{% endif %}" data-id="{{ actividad.id }}">
-                                {{ actividad.titulo }}
-                                {% if actividad.realizada %}✓{% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
+                    <h3>{{ tema.titulo }}</h3>
+                    {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
+                        <div class="actividad {% if actividad.realizada %}realizada{% endif %}" data-id="{{ actividad.id }}">
+                            {{ actividad.titulo }}
+                            {% if actividad.realizada %}<i class="fas fa-check"></i>{% endif %}
+                        </div>
+                    {% endfor %}
                 {% endfor %}
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
+</div>
 
-    <script>
+<script>
     $(document).ready(function() {
         $('.actividad').click(function() {
             var actividadId = $(this).data('id');
@@ -49,13 +68,13 @@
                 success: function(response) {
                     if (response.status === 'success') {
                         $this.addClass('realizada');
-                        $this.append(' ✓');
+                        $this.append(' <i class="fas fa-check"></i>');
                     }
                 }
             });
         });
     });
-    </script>
+</script>
 
 </body>
 </html>
