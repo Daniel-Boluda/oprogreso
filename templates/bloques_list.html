@@ -2,29 +2,240 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>Lista de Bloques</title>
     <style>
         body {
-            background-color: #f4f4f4;
+            background-color: #f8f1f4; /* Fondo en tono pastel */
+            font-family: Arial, sans-serif;
         }
+        
         .navbar-brand {
             font-weight: bold;
         }
-        .g_id_signin {
-            margin-top: 5px;
+        
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #e6ccd5; /* Tono pastel suave */
+            border-radius: 8px;
         }
-        .actividad {
-            cursor: pointer;
+        
+        .card-header {
+            background-color: #d6a4e0 !important; /* Lila claro */
+            color: white;
+            font-weight: bold;
+            text-align: center;
             padding: 10px;
+            border-radius: 8px 8px 0 0;
+            font-size: 18px;
+        }
+        
+        .card-header {
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background-color: #d6a4e0; /* Lila claro */
+            text-align: center;
+        }
+        
+        .card-body {
+            padding: 15px;
+            background-color: white;
+        }
+        
+        .actividad-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .actividad-button {
+            padding: 5px 10px;
+            border: 1px solid #f78fb3;
+            background-color: white;
+            color: #f78fb3;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px; /* Ancho mínimo fijo */
+            text-align: center; /* Centrar el texto */
+        }
+        
+        .actividad-button:hover {
+            background-color: #f8a5c2;
+            color: white;
+        }
+        
+        .actividad-button.realizada {
+            background-color: #d6a4e0;
+            color: white;
+            border-color: #d6a4e0;
+            cursor: default;
+        }
+        
+        table {
+            width: 100%;
+            border-spacing: 0;
+        }
+        
+        td {
+            text-align: left;
+            padding: 10px;
+        }
+        
+        th {
+            background-color: #f78fb3; /* Rosa pastel */
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        td {
+            border-bottom: 1px solid #f1d4dd; /* Línea suave */
+        }
+        
+        td.actividad-cell {
+            text-align: right;
+            white-space: nowrap;
+        }
+        
+        .achievement-label {
+            text-align: center; /* Centra el texto */
+            font-size: 24px; /* Aumenta el tamaño de la fuente */
+            font-weight: bold; /* Hace el texto más destacado */
+            color: #ffffff; /* Texto blanco */
+            background-color: #a56fcb; /* Fondo rojo festivo */
+            padding: 10px 20px; /* Espaciado interno */
+            border-radius: 10px; /* Bordes redondeados */
+            box-shadow: 0 0 15px #a56fcb; /* Resplandor */
+            animation: celebration 1s infinite alternate; /* Animación */
+            margin: 20px auto; /* Espaciado y centrado automático */
+            width: fit-content; /* Ajusta el ancho al contenido */
+        }
+
+        .achievement-bar {
+            position: relative;
+            background-color: #f1d4dd; /* Fondo barra pastel */
+            height: 20px; /* Incrementar altura */
+            border-radius: 20px; /* Ajustar para la nueva altura */
+            margin: 20px auto;
+            width: 80%;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            overflow: visible; /* Asegura que los marcadores sean visibles fuera de la barra */
+        }
+        
+        .achievement-progress {
+            background-color: #d6a4e0; /* Lila claro */
+            height: 100%; /* Ocupa toda la altura de la barra */
+            border-radius: 20px 0 0 20px; /* Bordes redondeados */
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .achievement-marker {
+            position: absolute;
+            top: -20px; /* Posiciona el marcador por encima de la barra */
+            height: 40px; /* Hacer los marcadores más grandes */
+            width: 40px; /* Hacer los marcadores más grandes */
+            margin-left: -20px; /* Centrar marcador en la barra */
+            border-radius: 50%; /* Forma circular */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px; /* Aumentar tamaño del texto */
+            color: white;
+            z-index: 10; /* Asegura que los marcadores estén "por delante" */
+        }
+        
+        .achievement-marker.reached {
+            background-color: #a889c6; /* Lila pastel para logros alcanzados */
+        }
+        
+        .achievement-marker.next {
+            background-color: #f8c5e3; /* Rosa pastel claro para el próximo logro */
+            color: #574b60; /* Texto en un tono neutral */
+        }
+        
+        .achievement-marker.locked {
+            background-color: #dbc3ce; /* Tono pastel suave para logros bloqueados */
+        }
+        
+        .achievement-label {
+            text-align: center; /* Centrar el texto */
+            font-size: 24px; /* Tamaño de fuente grande */
+            font-weight: bold; /* Texto destacado */
+            color: #ffffff; /* Texto blanco */
+            background-color: #a889c6; /* Fondo rojo vibrante */
+            padding: 10px 20px; /* Espaciado interno */
+            border-radius: 10px; /* Bordes redondeados */
+            margin: 20px auto; /* Centrar y espacio superior/inferior */
+            width: fit-content; /* Ajusta el ancho al contenido */
+            box-shadow: 0 0 10px #a889c6; /* Resplandor estático */
+        }
+
+        .achievement-marker .achievement-points {
+            position: absolute;
+            top: 50px; /* Posicionar debajo del marcador */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px; /* Ajustar tamaño de texto */
+            color: #c089b7; /* Lila-rosa pastel */
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap; /* Evitar que el texto se divida */
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+    
+        .popup-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+    
+        .popup-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #a56fcb; /* Lila pastel */
+            margin-bottom: 10px;
+        }
+    
+        .popup-description {
+            font-size: 16px;
+            color: #574b60; /* Texto en tono neutral */
+            margin-bottom: 20px;
+        }
+    
+        .popup-close {
+            background-color: #f78fb3; /* Rosa pastel */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
             border-radius: 5px;
+            cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        .actividad:hover {
-            background-color: #e9ecef; /* Light gray on hover */
-        }
-        .realizada {
-            background-color: #28a745; /* Success color */
-            color: white;
+    
+        .popup-close:hover {
+            background-color: #f8a5c2;
         }
     </style>
 </head>
@@ -32,49 +243,209 @@
 
 {% include 'navbar.html' %}
 
+<br>
+
 <div class="container mt-4">
-    <h1 class="text-center mb-4">Lista de Bloques</h1>
+    <div class="achievement-label">Cargando puntos...</div>
+    <br>
+    <div class="achievement-bar">
+        <div class="achievement-progress"></div>
+        <div id="achievement-markers"></div>
+    </div>
+
+    <br>
+    <br>
 
     {% for bloque in bloques %}
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2>{{ bloque.titulo }}</h2>
+        <div class="card">
+            <div class="card-header">
+                {{ bloque.titulo }}
             </div>
             <div class="card-body">
-                {% for tema in bloque.tema_set.all %}
-                    <h3>{{ tema.titulo }}</h3>
-                    {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
-                        <div class="actividad {% if actividad.realizada %}realizada{% endif %}" data-id="{{ actividad.id }}">
-                            {{ actividad.titulo }}
-                            {% if actividad.realizada %}<i class="fas fa-check"></i>{% endif %}
-                        </div>
-                    {% endfor %}
-                {% endfor %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tema</th>
+                            <th>Actividades</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tema in bloque.tema_set.all %}
+                            <tr>
+                                <td>    {{ tema.orden }} - {{ tema.titulo }}:
+                                    <ul>
+                                        <li>{{ tema.contenido }}</li>
+                                    </ul>
+                                </td>
+                                <td class="actividad-cell">
+                                    {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
+                                        <button 
+                                            class="actividad-button {% if actividad.realizada %}realizada{% endif %}" 
+                                            data-id="{{ actividad.id }}">
+                                            {{ actividad.titulo }}
+                                            {% if actividad.realizada %}<i class="fas fa-check"></i>{% endif %}
+                                        </button>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     {% endfor %}
 </div>
 
+<div class="popup-overlay" id="popup-overlay">
+    <div class="popup-content">
+        <h2 class="popup-title" id="popup-title"></h2>
+        <img id="popup-image" src="" alt="Foto del modelo" style="max-width: 100%; border-radius: 10px; margin-bottom: 10px;">
+        <p class="popup-description" id="popup-description"></p>
+        <button class="popup-close" id="popup-close">Cerrar</button>
+    </div>
+</div>
+
 <script>
-    $(document).ready(function() {
-        $('.actividad').click(function() {
-            var actividadId = $(this).data('id');
-            var $this = $(this);
-            
-            $.ajax({
-                url: '/marcar-actividad/' + actividadId + '/',
-                method: 'POST',
-                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $this.addClass('realizada');
-                        $this.append(' <i class="fas fa-check"></i>');
-                    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.actividad-button');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const actividadId = this.dataset.id;
+
+                if (!this.classList.contains('realizada')) {
+                    fetch(`/marcar-actividad/${actividadId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Marcar tarea como completada
+                            this.classList.add('realizada');
+                            this.textContent = `${this.textContent} ✓`;
+
+                            // Actualizar barra de logros y marcadores
+                            actualizarBarra(data.logros, data.total_puntos);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
                 }
             });
         });
     });
-</script>
 
+    function actualizarBarra(logros, totalPuntos) {
+        const progress = document.querySelector('.achievement-progress');
+        const label = document.querySelector('.achievement-label');
+        const markersContainer = document.querySelector('#achievement-markers');
+    
+        const maxPuntos = logros[logros.length - 1].puntos;
+    
+        const porcentaje = (totalPuntos / maxPuntos) * 100;
+        progress.style.width = `${Math.min(porcentaje, 100)}%`;
+    
+        label.textContent = `Puntos totales: ${totalPuntos}`;
+    
+        markersContainer.innerHTML = ''; // Limpia los marcadores existentes
+    
+        logros.forEach((logro) => {
+            // Crear el marcador principal
+            const marker = document.createElement('div');
+            marker.className = `achievement-marker ${logro.estado}`;
+            const left = (logro.puntos / maxPuntos) * 100;
+            marker.style.left = `${Math.min(left, 100)}%`;
+    
+            // Crear el contenedor para puntos del logro
+            const puntosLogro = document.createElement('div');
+            puntosLogro.className = 'achievement-points';
+            puntosLogro.textContent = `${logro.puntos}`;
+    
+            // Agregar el contenido al marcador
+            if (logro.recompensa) {
+                marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
+            } else if (logro.estado === 'reached') {
+                marker.textContent = '✔';
+            }
+    
+            // Añadir marcador y puntos al contenedor
+            marker.appendChild(puntosLogro);
+            markersContainer.appendChild(marker);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const apiUrl = '/obtener_logros/';
+        const popupOverlay = document.getElementById('popup-overlay');
+        const popupTitle = document.getElementById('popup-title');
+        const popupDescription = document.getElementById('popup-description');
+        const popupClose = document.getElementById('popup-close');
+    
+        // Cerrar el pop-up
+        popupClose.addEventListener('click', () => {
+            popupOverlay.style.display = 'none';
+        });
+    
+        // Cargar logros al inicializar
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                actualizarBarra(data.logros, data.total_puntos);
+            })
+            .catch(error => {
+                console.error('Error al cargar los logros:', error);
+            });
+    
+        function actualizarBarra(logros, totalPuntos) {
+            const progress = document.querySelector('.achievement-progress');
+            const label = document.querySelector('.achievement-label');
+            const markersContainer = document.querySelector('#achievement-markers');
+    
+            const maxPuntos = logros[logros.length - 1].puntos;
+            const porcentaje = (totalPuntos / maxPuntos) * 100;
+            progress.style.width = `${Math.min(porcentaje, 100)}%`;
+    
+            label.textContent = `Puntos totales: ${totalPuntos}`;
+            markersContainer.innerHTML = ''; // Limpia los marcadores existentes
+    
+            logros.forEach((logro, index) => {
+                const marker = document.createElement('div');
+                marker.className = `achievement-marker ${logro.estado}`;
+                const left = (logro.puntos / maxPuntos) * 100;
+                marker.style.left = `${Math.min(left, 100)}%`;
+    
+                if (logro.estado !== 'locked') {
+                    marker.addEventListener('click', () => {
+                        mostrarDetallesLogro(logro.nombre, logro.descripcion, logro.imagen);
+                    });
+                }
+    
+                if (logro.recompensa) {
+                    marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
+                } else if (logro.estado === 'reached') {
+                    marker.textContent = '✔';
+                }
+    
+                const puntosLogro = document.createElement('div');
+                puntosLogro.className = 'achievement-points';
+                puntosLogro.textContent = `${logro.puntos}`;
+                marker.appendChild(puntosLogro);
+    
+                markersContainer.appendChild(marker);
+            });
+        }
+    
+        function mostrarDetallesLogro(nombre, descripcion, imagenUrl) {
+            popupTitle.textContent = nombre;
+            popupDescription.textContent = descripcion;
+            const popupImage = document.getElementById('popup-image');
+            popupImage.src = imagenUrl; // Asigna la URL de la imagen
+            popupOverlay.style.display = 'flex';
+        }
+    });
+</script>
 </body>
 </html>

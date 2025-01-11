@@ -15,7 +15,6 @@ COPY requirements.txt /app/
 # Install system dependencies and Python dependencies
 RUN apt-get update \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir -r requirements.txt
 
 # Copy project files

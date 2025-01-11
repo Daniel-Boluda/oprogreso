@@ -4,31 +4,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
 from .models import Logro, Bloque, Tema, Actividad
 
-def homepage(request):
-    bloques = Bloque.objects.all().order_by('orden')
-    actividades = Actividad.objects.filter(realizada=True)
-    puntos_totales = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
-    
-    logros = Logro.objects.order_by('puntos_necesarios')
-    alcanzados = logros.filter(puntos_necesarios__lte=puntos_totales)
-    siguientes = logros.filter(puntos_necesarios__gt=puntos_totales)
-    
-    if alcanzados.count() >= 3:
-        logros_a_mostrar = list(alcanzados.order_by('-puntos_necesarios')[:3]) + list(siguientes[:3])
-    else:
-        logros_a_mostrar = list(alcanzados) + list(siguientes[:6-alcanzados.count()])
-    
-    puntos_totales_requeridos = logros.last().puntos_necesarios if logros.exists() else 0
-    porcentaje = (puntos_totales / puntos_totales_requeridos) * 100 if puntos_totales_requeridos > 0 else 0
-
-    return render(request, 'home.html', {
-        'bloques': bloques,
-        'logros': logros_a_mostrar,
-        'puntos_totales': puntos_totales,
-        'puntos_totales_requeridos': puntos_totales_requeridos,
-        'porcentaje': porcentaje,
-    })
-
 def about(request):
     return render(request, 'about.html')
 
@@ -46,7 +21,28 @@ def marcar_actividad(request, actividad_id):
 
 def bloques_list(request):
     bloques = Bloque.objects.all().order_by('orden')
-    return render(request, 'bloques_list.html', {'bloques': bloques})
+    actividades = Actividad.objects.filter(realizada=True)
+    puntos_totales = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
+    
+    logros = Logro.objects.order_by('puntos_necesarios')
+    alcanzados = logros.filter(puntos_necesarios__lte=puntos_totales)
+    siguientes = logros.filter(puntos_necesarios__gt=puntos_totales)
+    
+    if alcanzados.count() >= 3:
+        logros_a_mostrar = list(alcanzados.order_by('-puntos_necesarios')[:3]) + list(siguientes[:3])
+    else:
+        logros_a_mostrar = list(alcanzados) + list(siguientes[:6-alcanzados.count()])
+    
+    puntos_totales_requeridos = logros.last().puntos_necesarios if logros.exists() else 0
+    porcentaje = (puntos_totales / puntos_totales_requeridos) * 100 if puntos_totales_requeridos > 0 else 0
+
+    return render(request, 'bloques_list.html', {
+        'bloques': bloques,
+        'logros': logros_a_mostrar,
+        'puntos_totales': puntos_totales,
+        'puntos_totales_requeridos': puntos_totales_requeridos,
+        'porcentaje': porcentaje,
+    })
 
 def obtener_logros(request):
     actividades = Actividad.objects.filter(realizada=True)
