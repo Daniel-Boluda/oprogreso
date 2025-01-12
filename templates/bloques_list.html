@@ -348,23 +348,29 @@
         progress.style.width = `${Math.min(porcentaje, 100)}%`;
     
         label.textContent = `Puntos totales: ${totalPuntos}`;
-        markersContainer.innerHTML = ''; // Limpia los marcadores existentes
+        markersContainer.innerHTML = '';
     
-        logros.forEach((logro) => {
+        logros.forEach((logro, index) => {
             const marker = document.createElement('div');
             marker.className = `achievement-marker ${logro.estado}`;
             const left = (logro.puntos / maxPuntos) * 100;
             marker.style.left = `${Math.min(left, 100)}%`;
     
-            const puntosLogro = document.createElement('div');
-            puntosLogro.className = 'achievement-points';
-            puntosLogro.textContent = `${logro.puntos}`;
+            if (logro.estado !== 'locked') {
+                marker.addEventListener('click', () => {
+                    mostrarDetallesLogro(logro.nombre, logro.descripcion, logro.imagen);
+                });
+            }
     
             if (logro.recompensa) {
                 marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
             } else if (logro.estado === 'reached') {
                 marker.textContent = '✔';
             }
+    
+            const puntosLogro = document.createElement('div');
+            puntosLogro.className = 'achievement-points';
+            puntosLogro.textContent = `${logro.puntos}`;
     
             marker.appendChild(puntosLogro);
             markersContainer.appendChild(marker);
@@ -418,9 +424,7 @@
                     });
                 }
     
-                if (logro.recompensa) {
-                    marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
-                } else if (logro.estado === 'reached') {
+                if (logro.estado === 'reached') {
                     marker.textContent = '✔';
                 }
     
@@ -434,10 +438,21 @@
         }
     
         function mostrarDetallesLogro(nombre, descripcion, imagenUrl) {
+            const popupOverlay = document.getElementById('popup-overlay');
+            const popupTitle = document.getElementById('popup-title');
+            const popupDescription = document.getElementById('popup-description');
+            const popupImage = document.getElementById('popup-image');
+        
             popupTitle.textContent = nombre;
             popupDescription.textContent = descripcion;
-            const popupImage = document.getElementById('popup-image');
-            popupImage.src = imagenUrl; // Asigna la URL de la imagen
+            
+            if (imagenUrl) {
+                popupImage.src = imagenUrl;
+                popupImage.style.display = 'block';
+            } else {
+                popupImage.style.display = 'none';
+            }
+            
             popupOverlay.style.display = 'flex';
         }
     });

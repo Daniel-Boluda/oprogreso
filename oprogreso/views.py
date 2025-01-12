@@ -90,6 +90,7 @@ def obtener_logros(request):
             'puntos': logro.puntos_necesarios,
             'estado': estado,
             'descripcion': logro.descripcion,
+            'imagen': logro.imagen.url if logro.imagen else None,
         })
     
     return JsonResponse({
