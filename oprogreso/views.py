@@ -14,7 +14,33 @@ def marcar_actividad(request, actividad_id):
             actividad = Actividad.objects.get(id=actividad_id)
             actividad.realizada = True
             actividad.save()
-            return JsonResponse({'status': 'success'})
+            
+            actividades = Actividad.objects.filter(realizada=True)
+            total_puntos = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
+            
+            logros = Logro.objects.order_by('puntos_necesarios')
+            logros_data = []
+            
+            for logro in logros:
+                if logro.puntos_necesarios <= total_puntos:
+                    estado = 'reached'
+                elif logro == logros.filter(puntos_necesarios__gt=total_puntos).first():
+                    estado = 'next'
+                else:
+                    estado = 'locked'
+                
+                logros_data.append({
+                    'nombre': logro.nombre,
+                    'puntos': logro.puntos_necesarios,
+                    'estado': estado,
+                    'descripcion': logro.descripcion,
+                })
+            
+            return JsonResponse({
+                'status': 'success',
+                'logros': logros_data,
+                'total_puntos': total_puntos
+            })
         except Actividad.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)

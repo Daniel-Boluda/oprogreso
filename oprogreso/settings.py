@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 't1l!akl&b$(mxpla7_^u1kvl$j)f4cxvac&%&_sjrl-##c9@$('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Change to False in production
+DEBUG = os.getenv('DEBUG', False),
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'oprogreso.dbcloud.org', '*']
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    'whitenoise.runserver_nostatic',
     "oprogreso",
     "accounts"
 ]
@@ -53,7 +54,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware"
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = "oprogreso.urls"
@@ -124,6 +126,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Social authentication settings

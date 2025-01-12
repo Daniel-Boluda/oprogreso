@@ -312,7 +312,7 @@
         buttons.forEach(button => {
             button.addEventListener('click', function() {
                 const actividadId = this.dataset.id;
-
+        
                 if (!this.classList.contains('realizada')) {
                     fetch(`/marcar-actividad/${actividadId}/`, {
                         method: 'POST',
@@ -326,8 +326,8 @@
                         if (data.status === 'success') {
                             // Marcar tarea como completada
                             this.classList.add('realizada');
-                            this.textContent = `${this.textContent} ✓`;
-
+                            this.innerHTML = `${this.textContent} <i class="fas fa-check"></i>`;
+                            
                             // Actualizar barra de logros y marcadores
                             actualizarBarra(data.logros, data.total_puntos);
                         }
@@ -344,38 +344,33 @@
         const markersContainer = document.querySelector('#achievement-markers');
     
         const maxPuntos = logros[logros.length - 1].puntos;
-    
         const porcentaje = (totalPuntos / maxPuntos) * 100;
         progress.style.width = `${Math.min(porcentaje, 100)}%`;
     
         label.textContent = `Puntos totales: ${totalPuntos}`;
-    
         markersContainer.innerHTML = ''; // Limpia los marcadores existentes
     
         logros.forEach((logro) => {
-            // Crear el marcador principal
             const marker = document.createElement('div');
             marker.className = `achievement-marker ${logro.estado}`;
             const left = (logro.puntos / maxPuntos) * 100;
             marker.style.left = `${Math.min(left, 100)}%`;
     
-            // Crear el contenedor para puntos del logro
             const puntosLogro = document.createElement('div');
             puntosLogro.className = 'achievement-points';
             puntosLogro.textContent = `${logro.puntos}`;
     
-            // Agregar el contenido al marcador
             if (logro.recompensa) {
                 marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
             } else if (logro.estado === 'reached') {
                 marker.textContent = '✔';
             }
     
-            // Añadir marcador y puntos al contenedor
             marker.appendChild(puntosLogro);
             markersContainer.appendChild(marker);
         });
     }
+    
 
     document.addEventListener('DOMContentLoaded', function () {
         const apiUrl = '/obtener_logros/';
