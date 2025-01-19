@@ -1,4 +1,5 @@
 from django.db import models
+from ckeditor.fields import RichTextField  # Import the RichTextField
 
 class Bloque(models.Model):
     titulo = models.CharField(max_length=200)
@@ -9,7 +10,7 @@ class Bloque(models.Model):
 
 class Tema(models.Model):
     titulo = models.CharField(max_length=200)
-    contenido = models.TextField(null=True, blank=True)
+    contenido = RichTextField(null=True, blank=True)
     bloque = models.ForeignKey(Bloque, on_delete=models.CASCADE)  # Linking Tema to Bloque
     notas = models.TextField(blank=True)
     orden = models.IntegerField(default=0)  # Field for ordering

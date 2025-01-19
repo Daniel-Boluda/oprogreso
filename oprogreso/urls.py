@@ -12,6 +12,7 @@ urlpatterns = [
     path('obtener_logros/', views.obtener_logros, name='obtener_logros'),
     path('accounts/', include('accounts.urls')),
     path('', views.bloques_list, name='bloques_list'),
+    path('puntos-por-fecha/', views.puntos_por_fecha, name='puntos_por_fecha'),
 ]
 
 if settings.DEBUG:

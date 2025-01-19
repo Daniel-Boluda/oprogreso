@@ -257,43 +257,47 @@
     <br>
 
     {% for bloque in bloques %}
-        <div class="card">
-            <div class="card-header">
-                {{ bloque.titulo }}
-            </div>
-            <div class="card-body">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tema</th>
-                            <th>Actividades</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for tema in bloque.tema_set.all %}
-                            <tr>
-                                <td>    {{ tema.orden }} - {{ tema.titulo }}:
-                                    <ul>
-                                        <li>{{ tema.contenido }}</li>
-                                    </ul>
-                                </td>
-                                <td class="actividad-cell">
-                                    {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
-                                        <button 
-                                            class="actividad-button {% if actividad.realizada %}realizada{% endif %}" 
-                                            data-id="{{ actividad.id }}">
-                                            {{ actividad.titulo }}
-                                            {% if actividad.realizada %}<i class="fas fa-check"></i>{% endif %}
-                                        </button>
-                                    {% endfor %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="card">
+        <div class="card-header">
+            {{ bloque.titulo }}
         </div>
+        <div class="card-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Tema</th>
+                        <th style="text-align: center;">Actividades</th>
+                        <th style="text-align: center;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tema in bloque.tema_set.all|dictsort:"orden" %}
+                        <tr>
+                            <td>{{ tema.titulo }}:</td>
+                            <td>
+                                <ul>
+                                    <!-- Render contenido as HTML -->
+                                    {{ tema.contenido|safe }}
+                                </ul>
+                            </td>
+                            <td class="actividad-cell">
+                                {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
+                                    <button 
+                                        class="actividad-button {% if actividad.realizada %}realizada{% endif %}" 
+                                        data-id="{{ actividad.id }}">
+                                        {{ actividad.titulo }}
+                                        {% if actividad.realizada %}<i class="fas fa-check"></i>{% endif %}
+                                    </button>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
     {% endfor %}
+
 </div>
 
 <div class="popup-overlay" id="popup-overlay">
@@ -345,12 +349,16 @@
     
         const maxPuntos = logros[logros.length - 1].puntos;
         const porcentaje = (totalPuntos / maxPuntos) * 100;
+    
+        // Update the width of the progress bar
         progress.style.width = `${Math.min(porcentaje, 100)}%`;
     
-        label.textContent = `Puntos totales: ${totalPuntos}`;
-        markersContainer.innerHTML = '';
+        // Update the label to include total points and percentage
+        label.textContent = `Puntos totales: ${totalPuntos} (${Math.round(porcentaje)}%)`;
     
-        logros.forEach((logro, index) => {
+        markersContainer.innerHTML = ''; // Clear existing markers
+    
+        logros.forEach((logro) => {
             const marker = document.createElement('div');
             marker.className = `achievement-marker ${logro.estado}`;
             const left = (logro.puntos / maxPuntos) * 100;
@@ -361,22 +369,41 @@
                     mostrarDetallesLogro(logro.nombre, logro.descripcion, logro.imagen);
                 });
             }
-    
-            if (logro.recompensa) {
-                marker.innerHTML = `<span class="achievement-reward">${logro.recompensa}</span>`;
-            } else if (logro.estado === 'reached') {
+
+            // Add content to the marker
+            if (logro.estado === 'reached') {
                 marker.textContent = '✔';
             }
-    
+
+            // Create a container for points of the achievement
             const puntosLogro = document.createElement('div');
             puntosLogro.className = 'achievement-points';
             puntosLogro.textContent = `${logro.puntos}`;
-    
+        
+            // Append marker and points to the container
             marker.appendChild(puntosLogro);
             markersContainer.appendChild(marker);
         });
     }
     
+    function mostrarDetallesLogro(nombre, descripcion, imagenUrl) {
+        const popupOverlay = document.getElementById('popup-overlay');
+        const popupTitle = document.getElementById('popup-title');
+        const popupDescription = document.getElementById('popup-description');
+        const popupImage = document.getElementById('popup-image');
+    
+        popupTitle.textContent = nombre;
+        popupDescription.textContent = descripcion;
+        
+        if (imagenUrl) {
+            popupImage.src = imagenUrl;
+            popupImage.style.display = 'block';
+        } else {
+            popupImage.style.display = 'none';
+        }
+        
+        popupOverlay.style.display = 'flex';
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
         const apiUrl = '/obtener_logros/';
@@ -399,62 +426,6 @@
             .catch(error => {
                 console.error('Error al cargar los logros:', error);
             });
-    
-        function actualizarBarra(logros, totalPuntos) {
-            const progress = document.querySelector('.achievement-progress');
-            const label = document.querySelector('.achievement-label');
-            const markersContainer = document.querySelector('#achievement-markers');
-    
-            const maxPuntos = logros[logros.length - 1].puntos;
-            const porcentaje = (totalPuntos / maxPuntos) * 100;
-            progress.style.width = `${Math.min(porcentaje, 100)}%`;
-    
-            label.textContent = `Puntos totales: ${totalPuntos}`;
-            markersContainer.innerHTML = ''; // Limpia los marcadores existentes
-    
-            logros.forEach((logro, index) => {
-                const marker = document.createElement('div');
-                marker.className = `achievement-marker ${logro.estado}`;
-                const left = (logro.puntos / maxPuntos) * 100;
-                marker.style.left = `${Math.min(left, 100)}%`;
-    
-                if (logro.estado !== 'locked') {
-                    marker.addEventListener('click', () => {
-                        mostrarDetallesLogro(logro.nombre, logro.descripcion, logro.imagen);
-                    });
-                }
-    
-                if (logro.estado === 'reached') {
-                    marker.textContent = '✔';
-                }
-    
-                const puntosLogro = document.createElement('div');
-                puntosLogro.className = 'achievement-points';
-                puntosLogro.textContent = `${logro.puntos}`;
-                marker.appendChild(puntosLogro);
-    
-                markersContainer.appendChild(marker);
-            });
-        }
-    
-        function mostrarDetallesLogro(nombre, descripcion, imagenUrl) {
-            const popupOverlay = document.getElementById('popup-overlay');
-            const popupTitle = document.getElementById('popup-title');
-            const popupDescription = document.getElementById('popup-description');
-            const popupImage = document.getElementById('popup-image');
-        
-            popupTitle.textContent = nombre;
-            popupDescription.textContent = descripcion;
-            
-            if (imagenUrl) {
-                popupImage.src = imagenUrl;
-                popupImage.style.display = 'block';
-            } else {
-                popupImage.style.display = 'none';
-            }
-            
-            popupOverlay.style.display = 'flex';
-        }
     });
 </script>
 </body>

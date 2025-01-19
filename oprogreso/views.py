@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
+from django.utils import timezone
+from datetime import timedelta
 from .models import Logro, Bloque, Tema, Actividad
 
 def about(request):
@@ -107,3 +109,25 @@ def detalle_bloque(request, bloque_id):
     bloque = get_object_or_404(Bloque, id=bloque_id)
     temas = bloque.tema_set.all().order_by('orden')
     return render(request, 'detalle_bloque.html', {'bloque': bloque, 'temas': temas})
+
+def puntos_por_fecha(request):
+    # Get current date
+    today = timezone.now().date()
+    end_date = timezone.datetime(2025, 4, 1).date()
+
+    # Prepare a dictionary to hold points for each date
+    points_per_date = {}
+    
+    # Loop through each date from today to April 1st
+    current_date = today
+    while current_date <= end_date:
+        # Calculate total points for activities completed on this date
+        total_points = Actividad.objects.filter(
+            realizada=True,
+            fecha=current_date  # Assuming you have a field for completion date
+        ).aggregate(Sum('puntos'))['puntos__sum'] or 0
+        
+        points_per_date[current_date] = total_points
+        current_date += timedelta(days=1)
+
+    return render(request, 'puntos_por_fecha.html', {'points_per_date': points_per_date})

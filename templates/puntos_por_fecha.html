@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Puntos por Fecha</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f1f4; /* Pastel background */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+        canvas {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Puntos Totales por Fecha</h1>
+    <canvas id="pointsChart"></canvas>
+</div>
+
+<script>
+    const ctx = document.getElementById('pointsChart').getContext('2d');
+    
+    const labels = {{ points_per_date.keys|safe|join:", " }};
+    const data = {{ points_per_date.values|safe|join:", " }};
+
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Puntos Totales',
+                data: data,
+                borderColor: 'rgba(214, 164, 224, 1)',
+                backgroundColor: 'rgba(214, 164, 224, 0.2)',
+                borderWidth: 2,
+                fill: true,
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total de Puntos'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fecha'
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+</script>
+
+</body>
+</html>
