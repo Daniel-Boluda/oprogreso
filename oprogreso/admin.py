@@ -10,7 +10,7 @@ class TemaAdmin(admin.ModelAdmin):
     search_fields = ('titulo',)
 
 class ActividadAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'tema', 'realizada')
+    list_display = ('titulo', 'tema', 'realizada' , 'fecha'  , 'puntos')
     list_filter = ('realizada',)
 
 class LogroAdmin(admin.ModelAdmin):
@@ -18,7 +18,7 @@ class LogroAdmin(admin.ModelAdmin):
     search_fields = ('nombre',)
 
 # Register your models here.
-admin.site.register(Bloque)
-admin.site.register(Tema)
-admin.site.register(Actividad)
-admin.site.register(Logro)
+admin.site.register(Bloque, BloqueAdmin)
+admin.site.register(Tema, TemaAdmin)
+admin.site.register(Actividad, ActividadAdmin)
+admin.site.register(Logro, LogroAdmin)

@@ -3,8 +3,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 from .models import Logro, Bloque, Tema, Actividad
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 def about(request):
     return render(request, 'about.html')
@@ -15,6 +17,7 @@ def marcar_actividad(request, actividad_id):
         try:
             actividad = Actividad.objects.get(id=actividad_id)
             actividad.realizada = True
+            actividad.fecha = timezone.now()
             actividad.save()
             
             actividades = Actividad.objects.filter(realizada=True)
@@ -111,23 +114,32 @@ def detalle_bloque(request, bloque_id):
     return render(request, 'detalle_bloque.html', {'bloque': bloque, 'temas': temas})
 
 def puntos_por_fecha(request):
-    # Get current date
-    today = timezone.now().date()
-    end_date = timezone.datetime(2025, 4, 1).date()
+    # Set start and end dates
+    start_date = datetime(2025, 1, 1).date()
+    end_date = datetime(2025, 6, 30).date()
 
     # Prepare a dictionary to hold points for each date
     points_per_date = {}
     
-    # Loop through each date from today to April 1st
-    current_date = today
+    # Loop through each date from start_date to end_date
+    current_date = start_date
     while current_date <= end_date:
         # Calculate total points for activities completed on this date
         total_points = Actividad.objects.filter(
             realizada=True,
-            fecha=current_date  # Assuming you have a field for completion date
+            fecha__lte=current_date
         ).aggregate(Sum('puntos'))['puntos__sum'] or 0
         
         points_per_date[current_date] = total_points
         current_date += timedelta(days=1)
 
-    return render(request, 'puntos_por_fecha.html', {'points_per_date': points_per_date})
+    # Convert the dictionary to lists for labels and data
+    labels = [date.strftime('%Y-%m-%d') for date in points_per_date.keys()]
+    data = list(points_per_date.values())
+
+    context = {
+        'labels': labels,
+        'data': data,
+    }
+
+    return render(request, 'puntos_por_fecha.html', context)
