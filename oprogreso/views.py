@@ -116,21 +116,24 @@ def detalle_bloque(request, bloque_id):
 def puntos_por_fecha(request):
     # Set start and end dates
     start_date = datetime(2025, 1, 1).date()
-    end_date = datetime(2025, 6, 30).date()
+    end_date = datetime(2025, 3, 16).date()
 
     # Prepare a dictionary to hold points for each date
     points_per_date = {}
     
+    # Calculate total points for all activities
+    total_points = Actividad.objects.aggregate(Sum('puntos'))['puntos__sum'] or 0
+    
     # Loop through each date from start_date to end_date
     current_date = start_date
     while current_date <= end_date:
-        # Calculate total points for activities completed on this date
-        total_points = Actividad.objects.filter(
+        # Calculate cumulative points for activities completed up to this date
+        cumulative_points = Actividad.objects.filter(
             realizada=True,
             fecha__lte=current_date
         ).aggregate(Sum('puntos'))['puntos__sum'] or 0
         
-        points_per_date[current_date] = total_points
+        points_per_date[current_date] = cumulative_points
         current_date += timedelta(days=1)
 
     # Convert the dictionary to lists for labels and data
@@ -140,6 +143,7 @@ def puntos_por_fecha(request):
     context = {
         'labels': labels,
         'data': data,
+        'total_points': total_points,
     }
 
     return render(request, 'puntos_por_fecha.html', context)

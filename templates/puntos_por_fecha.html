@@ -34,9 +34,10 @@
 
 <script>
     const ctx = document.getElementById('pointsChart').getContext('2d');
-    
+
     const labels = {{ labels|safe }};
     const data = {{ data|safe }};
+    const totalPoints = {{ total_points }};
 
     const myChart = new Chart(ctx, {
         type: 'line',
@@ -49,11 +50,20 @@
                 backgroundColor: 'rgba(214, 164, 224, 0.2)',
                 borderWidth: 2,
                 fill: true,
+            },
+            {
+                label: 'Referencia',
+                data: [
+                    {x: labels[0], y: 0},
+                    {x: labels[labels.length - 1], y: totalPoints}
+                ],
+                borderColor: 'rgba(128, 128, 128, 0.7)',
+                borderWidth: 2,
+                fill: false,
+                pointRadius: 0,
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
@@ -66,19 +76,11 @@
                     title: {
                         display: true,
                         text: 'Fecha'
-                    },
-                    ticks: {
-                        maxRotation: 45,
-                        minRotation: 45
                     }
                 }
             },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            }
+            responsive: true,
+            maintainAspectRatio: false,
         }
     });
 </script>
