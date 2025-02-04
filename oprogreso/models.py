@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from ckeditor.fields import RichTextField  # Import the RichTextField
 
 class Bloque(models.Model):
@@ -23,7 +24,9 @@ class Actividad(models.Model):
     tema = models.ForeignKey(Tema, on_delete=models.CASCADE)  # Linking Actividad to Tema
     puntos = models.IntegerField(default=0)
     realizada = models.BooleanField(default=False)
-    fecha = models.DateTimeField(auto_now_add=True)  # Field for date
+    repetible = models.BooleanField(default=False)
+    veces_realizada = models.IntegerField(default=0)
+    fecha = models.DateTimeField(default=timezone.now)
     orden = models.IntegerField(default=0)  # Field for ordering
 
     def __str__(self):

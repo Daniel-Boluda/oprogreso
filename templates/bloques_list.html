@@ -73,6 +73,35 @@
             cursor: default;
         }
         
+        .contador-realizaciones {
+            margin-left: 8px;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #a56fcb;
+            background-color: #f3e5f5;
+            padding: 2px 8px;
+            border-radius: 15px;
+            display: inline-block;
+            min-width: 25px;
+            text-align: center;
+        }
+        
+        .actividad-button[data-repetible="true"] {
+            border-style: dashed;
+            position: relative;
+        }
+        
+        .actividad-button[data-repetible="true"]:hover::after {
+            content: "REPETIBLE";
+            position: absolute;
+            right: -70px;
+            background: #f3e5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            color: #a56fcb;
+        }
+
         table {
             width: 100%;
             border-spacing: 0;
@@ -283,10 +312,16 @@
                             <td class="actividad-cell">
                                 {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
                                     <button 
-                                        class="actividad-button {% if actividad.realizada %}realizada{% endif %}" 
-                                        data-id="{{ actividad.id }}">
+                                        class="actividad-button {% if not actividad.repetible and actividad.veces_realizada > 0 %}realizada{% endif %}" 
+                                        data-id="{{ actividad.id }}"
+                                        data-repetible="{{ actividad.repetible|lower }}">
                                         {{ actividad.titulo }}
-                                        {% if actividad.realizada %}<i class="fas fa-check"></i>{% endif %}
+                                        {% if actividad.veces_realizada > 0 %}
+                                            {% if actividad.repetible %}
+                                                <span class="contador-realizaciones">x{{ actividad.veces_realizada }}</span>
+                                            {% endif %}
+                                            <i class="fas fa-check"></i>
+                                        {% endif %}
                                     </button>
                                 {% endfor %}
                             </td>
@@ -316,8 +351,10 @@
         buttons.forEach(button => {
             button.addEventListener('click', function() {
                 const actividadId = this.dataset.id;
-        
-                if (!this.classList.contains('realizada')) {
+                const esRepetible = this.dataset.repetible === 'true';
+            
+                // Permitir clic si es repetible o no está realizada
+                if (esRepetible || !this.classList.contains('realizada')) {
                     fetch(`/marcar-actividad/${actividadId}/`, {
                         method: 'POST',
                         headers: {
@@ -328,11 +365,27 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            // Marcar tarea como completada
-                            this.classList.add('realizada');
-                            this.innerHTML = `${this.textContent} <i class="fas fa-check"></i>`;
+                            // Actualizar solo si no es repetible
+                            if (!esRepetible) {
+                                this.classList.add('realizada');
+                            }
                             
-                            // Actualizar barra de logros y marcadores
+                            // Actualizar contador para actividades repetibles
+                            if (esRepetible) {
+                                const contador = this.querySelector('.contador-realizaciones');
+                                const nuevoConteo = (parseInt(contador?.textContent.replace('x','') || 0) + 1);
+                                
+                                if (contador) {
+                                    contador.textContent = `x${nuevoConteo}`;
+                                } else {
+                                    const nuevoContador = document.createElement('span');
+                                    nuevoContador.className = 'contador-realizaciones';
+                                    nuevoContador.textContent = `x1`;
+                                    this.insertBefore(nuevoContador, this.querySelector('i'));
+                                }
+                            }
+                            
+                            this.innerHTML += ' <i class="fas fa-check"></i>';
                             actualizarBarra(data.logros, data.total_puntos);
                         }
                     })

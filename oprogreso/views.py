@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Sum
+from django.db.models import Sum, Min
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 from .models import Logro, Bloque, Tema, Actividad
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -17,11 +17,15 @@ def marcar_actividad(request, actividad_id):
         try:
             actividad = Actividad.objects.get(id=actividad_id)
             actividad.realizada = True
+            if not actividad.repetible and actividad.veces_realizada != 1:
+                actividad.veces_realizada = 1
+            else:                
+                actividad.veces_realizada += 1
             actividad.fecha = timezone.now()
             actividad.save()
             
             actividades = Actividad.objects.filter(realizada=True)
-            total_puntos = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
+            total_puntos = calcular_puntos(actividades)
             
             logros = Logro.objects.order_by('puntos_necesarios')
             logros_data = []
@@ -50,10 +54,17 @@ def marcar_actividad(request, actividad_id):
             return JsonResponse({'status': 'error', 'message': 'Actividad no encontrada'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
+def calcular_puntos(actividades):
+    total = 0
+    for act in actividades:
+        if act.veces_realizada > 0:
+            total += act.puntos * sum(1/(2**n) for n in range(act.veces_realizada))
+    return round(total, 2)
+
 def bloques_list(request):
     bloques = Bloque.objects.all().order_by('orden')
     actividades = Actividad.objects.filter(realizada=True)
-    puntos_totales = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
+    puntos_totales = calcular_puntos(actividades)
     
     logros = Logro.objects.order_by('puntos_necesarios')
     alcanzados = logros.filter(puntos_necesarios__lte=puntos_totales)
@@ -77,7 +88,7 @@ def bloques_list(request):
 
 def obtener_logros(request):
     actividades = Actividad.objects.filter(realizada=True)
-    total_puntos = actividades.aggregate(Sum('puntos'))['puntos__sum'] or 0
+    total_puntos = total_puntos = calcular_puntos(actividades)
     
     logros = Logro.objects.order_by('puntos_necesarios')
     logros_data = []
@@ -115,8 +126,13 @@ def detalle_bloque(request, bloque_id):
 
 def puntos_por_fecha(request):
     # Set start and end dates
-    start_date = datetime(2025, 1, 1).date()
-    end_date = datetime(2025, 3, 16).date()
+    start_date = Actividad.objects.filter(realizada=True).aggregate(Min('fecha'))['fecha__min']
+    if not start_date:
+        start_date = date(2025, 1, 1)
+    else:
+        start_date = start_date.date()  # Convert to date object
+    
+    end_date = date(2025, 3, 16)
 
     # Prepare a dictionary to hold points for each date
     points_per_date = {}
@@ -130,7 +146,7 @@ def puntos_por_fecha(request):
         # Calculate cumulative points for activities completed up to this date
         cumulative_points = Actividad.objects.filter(
             realizada=True,
-            fecha__lte=current_date
+            fecha__date__lte=current_date
         ).aggregate(Sum('puntos'))['puntos__sum'] or 0
         
         points_per_date[current_date] = cumulative_points

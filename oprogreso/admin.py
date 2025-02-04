@@ -12,6 +12,7 @@ class TemaAdmin(admin.ModelAdmin):
 class ActividadAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'tema', 'realizada' , 'fecha'  , 'puntos')
     list_filter = ('realizada',)
+    list_editable = ('puntos', 'realizada', 'fecha')
 
 class LogroAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'puntos_necesarios', 'completado')
