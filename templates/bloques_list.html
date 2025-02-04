@@ -312,7 +312,7 @@
                             <td class="actividad-cell">
                                 {% for actividad in tema.actividad_set.all|dictsort:"orden" %}
                                     <button 
-                                        class="actividad-button {% if not actividad.repetible and actividad.veces_realizada > 0 %}realizada{% endif %}" 
+                                        class="actividad-button {% if actividad.veces_realizada > 0 %}realizada{% endif %}" 
                                         data-id="{{ actividad.id }}"
                                         data-repetible="{{ actividad.repetible|lower }}">
                                         {{ actividad.titulo }}
@@ -382,10 +382,10 @@
                                     nuevoContador.className = 'contador-realizaciones';
                                     nuevoContador.textContent = `x1`;
                                     this.insertBefore(nuevoContador, this.querySelector('i'));
+                                    this.innerHTML += ' <i class="fas fa-check"></i>';
                                 }
                             }
                             
-                            this.innerHTML += ' <i class="fas fa-check"></i>';
                             actualizarBarra(data.logros, data.total_puntos);
                         }
                     })
